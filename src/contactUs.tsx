@@ -6,9 +6,8 @@ const CONTACT = {
   /** What callers see on the page */
   businessPhone: "(555) 000-0000",
   /** Same number for the link: international form (+1…) so phones/apps can dial correctly */
-  businessTel: "+15550000000",
-  hoursWeekdays: "Monday–Friday: 9:00 a.m. – 5:00 p.m.",
-  hoursWeekend: "Saturday: By appointment · Sunday: Closed",
+  hoursWeekdays: "Monday–Friday: 9:00 a.m. – 5:00 p.",
+  hoursWeekend: "Sunday: By appointment ",
 };
 
 export default function ContactUs() {
@@ -44,7 +43,7 @@ export default function ContactUs() {
               <dt>Business phone</dt>
               <dd>
                 {/* tel: opens the dialer on phones / click-to-call in many browsers */}
-                <a href={`tel:${CONTACT.businessTel}`}>{CONTACT.businessPhone}</a>
+                <a href={`tel:${CONTACT.businessPhone}`}>{CONTACT.businessPhone}</a>
               </dd>
             </div>
             <div className="contact__row">
