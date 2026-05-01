@@ -131,9 +131,12 @@ a:hover {
 }
 
 button:focus-visible,
-.btn:focus-visible,
-.segmented button:focus-visible {
+.btn:focus-visible {
   box-shadow: var(--focus-ring), var(--shadow-sm);
+}
+
+.segmented button:focus-visible {
+  box-shadow: var(--focus-ring);
 }
 
 .visually-hidden {

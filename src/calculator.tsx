@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link } from 'react-router'
 import AmortizationTable from './amortizationTable';
 
 import NumericInput from './utilitys/NumericInput';
-import useDebounce from "./utilitys/useDebounce";
+import useDebounce from './utilitys/useDebounce';
 
 function monthlyPayment(P: number, annualRate: number, years: number) {
   const r = annualRate / 100 / 12;
@@ -17,12 +17,14 @@ const fmt = new Intl.NumberFormat("en-US", {
   currency: "USD",
 });
 
+const EMPTY_DASH = "—";
+
 export default function MortgageCalculator() {
-  const [price, setPrice] = useState("500000");
-  const [downPmt, setDownPmt] = useState("20");
-  const [rate, setRate] = useState("6.5");
-  const [years, setYears] = useState("30");
-  const [tax, setTax] = useState("6000");
+  const [price, setPrice] = useState("");
+  const [downPmt, setDownPmt] = useState("");
+  const [rate, setRate] = useState("");
+  const [years, setYears] = useState("");
+  const [tax, setTax] = useState("");
   const [showTable, setShowTable] = useState(false);
   const [TypeForDpmt, setTypeForDpmt] = useState("%");
 
@@ -36,13 +38,29 @@ export default function MortgageCalculator() {
   const rateNum = Number(dRate);
   const yearsNum = Number(years);
 
+  const inputsReady =
+    dPrice.trim() !== "" &&
+    dRate.trim() !== "" &&
+    years !== "";
+
   const finalDownPmt = TypeForDpmt === "%" ? (priceNum * downPmtNum) / 100 : downPmtNum
+
+  const downPaymentInvalid =
+    inputsReady &&
+    priceNum > 0 &&
+    finalDownPmt > priceNum;
+
+  const summaryReady = inputsReady && !downPaymentInvalid;
 
   const loanAmt = priceNum - finalDownPmt > 0 ? priceNum - finalDownPmt : 0;
   const baseMonthlyPmt = monthlyPayment(loanAmt, rateNum, yearsNum);
   const monthlyTax = Number(dTax) / 12;
   const totalMonthlyPmt = baseMonthlyPmt + monthlyTax;
+  const tableVisible = showTable && summaryReady;
 
+  const dismissScheduleIfOpen = useCallback(() => {
+    setShowTable((open) => (open ? false : open));
+  }, []);
 
   return (
     <div className="page calculator">
@@ -60,58 +78,89 @@ export default function MortgageCalculator() {
               <span className="field__label">Home price</span>
               <NumericInput
                 value={price}
-                onChange={setPrice}
+                onChange={(v) => {
+                  dismissScheduleIfOpen();
+                  setPrice(v);
+                }}
                 prefix="$"
+                placeholder="500,000"
               />
             </label>
 
             <div className="field">
               <span className="field__label" id="down-label">Down payment</span>
-              <div className="field__row">
+              <div className="field__row field__row--dp">
                 <NumericInput
                   className="num-input field__grow"
                   value={downPmt}
-                  onChange={setDownPmt}
+                  onChange={(v) => {
+                    dismissScheduleIfOpen();
+                    setDownPmt(v);
+                  }}
                   prefix={TypeForDpmt === "$" ? "$" : ""}
                   suffix={TypeForDpmt === "%" ? "%" : ""}
                   aria-labelledby="down-label"
+                  placeholder={TypeForDpmt === "%" ? "20" : "100,000"}
                 />
-                <div className="segmented" role="group" aria-label="Down payment type">
+                <div
+                  className="segmented segmented--dp"
+                  role="group"
+                  aria-label="Down payment type"
+                >
                   <button
                     type="button"
                     className={TypeForDpmt === "%" ? "is-selected" : ""}
-                    onClick={() => setTypeForDpmt("%")}
+                    onClick={() => {
+                      dismissScheduleIfOpen();
+                      setTypeForDpmt("%");
+                    }}
                   >
                     %
                   </button>
                   <button
                     type="button"
                     className={TypeForDpmt === "$" ? "is-selected" : ""}
-                    onClick={() => setTypeForDpmt("$")}
+                    onClick={() => {
+                      dismissScheduleIfOpen();
+                      setTypeForDpmt("$");
+                    }}
                   >
                     $
                   </button>
                 </div>
               </div>
+              {downPaymentInvalid && (
+                <p className="calc-hint calc-hint--warn" role="alert">
+                  Down payment can't exceed the home price.
+                </p>
+              )}
             </div>
 
             <label className="field">
               <span className="field__label">Annual property tax</span>
               <NumericInput
                 value={tax}
-                onChange={setTax}
+                onChange={(v) => {
+                  dismissScheduleIfOpen();
+                  setTax(v);
+                }}
                 prefix="$"
+                placeholder="6,000"
               />
             </label>
 
             <label className="field">
               <span className="field__label">
-                Interest rate (%) — <Link to="/Rates">view sample rates</Link>
+                Interest rate (%) — <Link to="/Rates">view current avg. rates</Link>
               </span>
               <NumericInput
                 value={rate}
-                onChange={setRate}
+                onChange={(v) => {
+                  dismissScheduleIfOpen();
+                  setRate(v);
+                }}
                 suffix="%"
+                placeholder="6.5"
               />
             </label>
 
@@ -121,21 +170,30 @@ export default function MortgageCalculator() {
                 <button
                   type="button"
                   className={years === "10" ? "is-selected" : ""}
-                  onClick={() => setYears("10")}
+                  onClick={() => {
+                    dismissScheduleIfOpen();
+                    setYears("10");
+                  }}
                 >
                   10
                 </button>
                 <button
                   type="button"
                   className={years === "15" ? "is-selected" : ""}
-                  onClick={() => setYears("15")}
+                  onClick={() => {
+                    dismissScheduleIfOpen();
+                    setYears("15");
+                  }}
                 >
                   15
                 </button>
                 <button
                   type="button"
                   className={years === "30" ? "is-selected" : ""}
-                  onClick={() => setYears("30")}
+                  onClick={() => {
+                    dismissScheduleIfOpen();
+                    setYears("30");
+                  }}
                 >
                   30
                 </button>
@@ -144,41 +202,76 @@ export default function MortgageCalculator() {
           </div>
         </div>
 
-        <aside className="card calculator__summary" aria-label="Payment summary">
-          <div className="summary-line">
-            <span>Down payment</span>
-            <strong>{fmt.format(finalDownPmt)}</strong>
+        <aside
+          className="card calculator__summary"
+          aria-labelledby="summary-heading"
+        >
+          <header className="summary__header">
+            <h2 id="summary-heading" className="summary__title">
+              Payment summary
+            </h2>
+          </header>
+
+          <div className="summary__lines">
+            <div className="summary-line">
+              <span>Down payment</span>
+              <strong>
+                {summaryReady ? fmt.format(finalDownPmt) : EMPTY_DASH}
+              </strong>
+            </div>
+            <div className="summary-line">
+              <span>Loan amount</span>
+              <strong>
+                {summaryReady ? fmt.format(loanAmt) : EMPTY_DASH}
+              </strong>
+            </div>
+            <div className="summary-line">
+              <span>Mortgage (est.)</span>
+              <strong>
+                {summaryReady ? fmt.format(baseMonthlyPmt) : EMPTY_DASH}
+              </strong>
+            </div>
+            <div className="summary-line">
+              <span>Property tax / mo</span>
+              <strong>
+                {summaryReady ? fmt.format(monthlyTax) : EMPTY_DASH}
+              </strong>
+            </div>
           </div>
-          <div className="summary-line">
-            <span>Loan amount</span>
-            <strong>{fmt.format(loanAmt)}</strong>
-          </div>
-          <div className="summary-line">
-            <span>Mortgage (est.)</span>
-            <strong>{fmt.format(baseMonthlyPmt)}</strong>
-          </div>
-          <div className="summary-line">
-            <span>Property tax / mo</span>
-            <strong>{fmt.format(monthlyTax)}</strong>
-          </div>
-          <div className="summary-total summary-line">
-            <span>Estimated total / mo</span>
-            <strong>{fmt.format(totalMonthlyPmt)}</strong>
+
+          <div className="summary-total" role="status" aria-live="polite">
+            <span className="summary-total__label">Estimated total / month</span>
+            <strong className="summary-total__amount">
+              {summaryReady ? fmt.format(totalMonthlyPmt) : EMPTY_DASH}
+            </strong>
           </div>
 
           <div className="summary-actions">
             <button
               type="button"
               className="btn"
-              onClick={() => setShowTable(!showTable)}
+              disabled={!summaryReady && !showTable}
+              onClick={() => {
+                if (showTable) setShowTable(false);
+                else if (summaryReady) setShowTable(true);
+              }}
+              title={
+                !showTable && !inputsReady
+                  ? "Enter home price, rate, and loan term first"
+                  : !showTable && downPaymentInvalid
+                    ? "Down payment must be less than or equal to the home price"
+                    : undefined
+              }
             >
-              {showTable ? "Hide amortization schedule" : "Show amortization schedule"}
+              {showTable
+                ? "Hide amortization schedule"
+                : "Show amortization schedule"}
             </button>
           </div>
         </aside>
       </div>
 
-      {showTable && (
+      {tableVisible && (
         <AmortizationTable
           loanAmt={loanAmt}
           rateNum={rateNum}

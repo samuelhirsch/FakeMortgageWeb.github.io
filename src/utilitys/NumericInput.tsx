@@ -8,6 +8,7 @@ interface NumericInputProps {
   decimalScale?: number;
   className?: string;
   id?: string;
+  placeholder?: string;
 }
 
 export default function NumericInput({
@@ -18,12 +19,14 @@ export default function NumericInput({
   decimalScale = 2,
   className = "num-input",
   id,
+  placeholder,
 }: NumericInputProps) {
   return (
     <NumericFormat
       id={id}
       className={className}
       value={value}
+      placeholder={placeholder}
       onValueChange={(values) => onChange(values.value)}
       thousandSeparator
       prefix={prefix}

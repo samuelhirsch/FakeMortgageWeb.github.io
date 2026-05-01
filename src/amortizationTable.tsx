@@ -7,7 +7,7 @@ const fmt = new Intl.NumberFormat("en-US", {
   currency: "USD",
 });
 
-type amorRow = {
+type AmortRow = {
   month?: number;
   year?: number;
   principal: number;
@@ -16,9 +16,9 @@ type amorRow = {
   remainingBalance: number;
 };
 type AmortResult = {
-  rows: amorRow[];
-  intrestPaid?: number;
-  intrestSaved?: number;
+  rows: AmortRow[];
+  interestPaid?: number;
+  interestSaved?: number;
   error?: string;
 };
 
@@ -32,11 +32,11 @@ type mortgageInfo = {
 export default function AmortizationTable(props: mortgageInfo) {
   const { loanAmt, rateNum, yearsNum, baseMonthlyPmt } = props;
   const [viewMode, setViewMode] = useState<"monthly" | "yearly">("monthly");
-  const [extraYearlyPayment, setExtraYearlyPayment] = useState<string>("0");
+  const [extraYearlyPayment, setExtraYearlyPayment] = useState("");
   const dextraYearlyPayment = useDebounce(extraYearlyPayment);
 
   const tableData: AmortResult = useMemo(() => {
-    const schedule: amorRow[] = [];
+    const schedule: AmortRow[] = [];
     if (
       loanAmt <= 0 ||
       yearsNum <= 0 ||
@@ -107,21 +107,21 @@ export default function AmortizationTable(props: mortgageInfo) {
       if (remainingBalanceInCents <= 0) break;
     }
 
-    const intrestSavedInCents =
+    const interestSavedInCents =
       totalInterestBaselineCents - cumulativeInterestInCents;
 
     return {
       rows: schedule,
-      intrestPaid: cumulativeInterestInCents / 100,
-      intrestSaved: intrestSavedInCents / 100,
+      interestPaid: cumulativeInterestInCents / 100,
+      interestSaved: interestSavedInCents / 100,
     };
   }, [loanAmt, rateNum, yearsNum, baseMonthlyPmt, dextraYearlyPayment]);
 
-  const displayRows: amorRow[] = useMemo(() => {
+  const displayRows: AmortRow[] = useMemo(() => {
     if (tableData.error || tableData.rows.length === 0) return [];
 
     if (viewMode === "monthly") return tableData.rows;
-    const yearlySchedule: amorRow[] = [];
+    const yearlySchedule: AmortRow[] = [];
     for (let i = 0; i < tableData.rows.length; i += 12) {
       const yearSlice = tableData.rows.slice(i, i + 12);
       if (yearSlice.length === 0) break;
@@ -145,54 +145,62 @@ export default function AmortizationTable(props: mortgageInfo) {
   return (
     <section className="amort card">
       <div className="amort__toolbar">
-        <h3>
-          Schedule by {viewMode === "monthly" ? "month" : "year"}
-        </h3>
-        <div
-          className="segmented"
-          role="group"
-          aria-label="Amortization view"
-        >
-          <button
-            type="button"
-            className={viewMode === "monthly" ? "is-selected" : ""}
-            onClick={() => setViewMode("monthly")}
+        <div className="amort__schedule-cluster">
+          <h3 id="amort-schedule-heading" className="amort__schedule-heading">
+            Schedule by
+          </h3>
+          <div
+            className="segmented segmented--amort"
+            role="group"
+            aria-labelledby="amort-schedule-heading"
           >
-            Monthly
-          </button>
-          <button
-            type="button"
-            className={viewMode === "yearly" ? "is-selected" : ""}
-            onClick={() => setViewMode("yearly")}
-          >
-            Yearly
-          </button>
+            <button
+              type="button"
+              className={viewMode === "monthly" ? "is-selected" : ""}
+              onClick={() => setViewMode("monthly")}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              className={viewMode === "yearly" ? "is-selected" : ""}
+              onClick={() => setViewMode("yearly")}
+            >
+              Yearly
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="amort-extra">
-        <label className="field">
-          <span className="field__label">Extra payment (once per year)</span>
-          <NumericInput
-            value={extraYearlyPayment}
-            onChange={setExtraYearlyPayment}
-            prefix="$"
-          />
-        </label>
-      </div>
-
-      {!tableData.error && (
-        <div className="amort-metrics">
-          <p>
-            <span>Estimated interest paid</span>
-            <strong>{fmt.format(tableData.intrestPaid ?? 0)}</strong>
-          </p>
-          <p>
-            <span>Interest difference vs baseline (extras)</span>
-            <strong>{fmt.format(tableData.intrestSaved ?? 0)}</strong>
-          </p>
+      <div className="amort__meta">
+        <div className="amort-extra">
+          <label className="field amort-extra__field">
+            <span className="field__label amort-extra__label">
+              Extra payment (once/year)
+            </span>
+            <NumericInput
+              className="num-input amort-extra__input"
+              value={extraYearlyPayment}
+              onChange={setExtraYearlyPayment}
+              prefix="$"
+              placeholder="0"
+            />
+          </label>
         </div>
-      )}
+
+        {!tableData.error && (
+          <div className="amort-metrics">
+            <p>
+              <span>Estimated interest paid</span>
+              <strong>{fmt.format(tableData.interestPaid ?? 0)}</strong>
+            </p>
+            <p>
+              <span>Interest saved with your yearly extra payment</span>
+              <strong>{fmt.format(tableData.interestSaved ?? 0)}</strong>
+            </p>
+          </div>
+        )}
+      </div>
 
       <div className="table-shell">
         <table className="data-table">
