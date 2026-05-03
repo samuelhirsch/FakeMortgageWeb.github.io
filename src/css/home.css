@@ -3,7 +3,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: max(calc(100dvh - 10rem), 22rem);
+  min-height: 0;
   position: relative;
   overflow: hidden;
   background: linear-gradient(175deg,
@@ -17,7 +17,7 @@
   position: absolute;
   inset: 0;
   background: url("/pics/background2.png") center / cover no-repeat;
-  opacity: 0.62;
+  opacity: 0.68;
   transform: scale(1);
   transform-origin: center;
   animation: homeBgBreath 14s ease-in-out infinite;
@@ -30,9 +30,9 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(175deg,
-      rgba(255, 255, 255, 0.26) 0%,
-      rgba(247, 252, 249, 0.22) 45%,
-      rgba(242, 249, 245, 0.28) 100%);
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(247, 252, 249, 0.14) 45%,
+      rgba(242, 249, 245, 0.2) 100%);
   pointer-events: none;
 }
 
@@ -87,7 +87,7 @@
   width: 100%;
   flex: 1 1 auto;
   min-height: 0;
-  padding: clamp(2.2rem, 6vw, 4.25rem) clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1.6rem, 5vw, 3.25rem) clamp(1rem, 3.6vw, 2.35rem);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -103,16 +103,27 @@
 .home-slide-shell.home-hero::before {
   content: "";
   position: absolute;
-  inset: -40%;
-  background: radial-gradient(circle at 30% 50%, rgba(13, 122, 88, 0.04), transparent 52%);
+  inset: 0;
+  background: radial-gradient(circle at 30% 50%, rgba(13, 122, 88, 0.05), transparent 58%);
   pointer-events: none;
   border-radius: var(--radius-lg);
 }
 
 .home-slide {
+  position: relative;
+  z-index: 0;
   /* Match `.site-main` column width so the hero doesn’t look like a tiny strip on desktops */
   width: min(100%, var(--content-max));
   margin: 0 auto;
+  padding: clamp(1.35rem, 4.2vw, 2.1rem) clamp(1.2rem, 3.8vw, 2rem);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(13, 122, 88, 0.22);
+  box-shadow:
+    0 6px 28px rgba(12, 42, 28, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  backdrop-filter: saturate(125%) blur(7px);
+  -webkit-backdrop-filter: saturate(125%) blur(7px);
 }
 
 .home-slide__title {
@@ -240,6 +251,12 @@
   font-size: 1.05rem;
 }
 
+@supports not ((backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px))) {
+  .home-slide {
+    background: rgba(249, 252, 250, 0.58);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-carousel::before {
     animation: none;
@@ -250,17 +267,16 @@
 
 /* Desktop: larger type + wider measure so copy uses the screen, not a narrow column */
 @media (min-width: 900px) {
-  .home-carousel {
-    min-height: max(calc(100dvh - 9rem), 26rem);
-  }
-
   .home-slide {
     width: min(100%, min(94vw, 80rem));
+    padding: clamp(1.75rem, 3.2vmin, 2.65rem) clamp(1.5rem, 3vw, 2.65rem);
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(13, 122, 88, 0.24);
   }
 
   .home-slide-shell.home-hero {
     justify-content: center;
-    padding: clamp(2rem, 4vmin, 3.5rem) clamp(1.25rem, 3vw, 2.25rem);
+    padding: clamp(1.5rem, 4vmin, 3rem) clamp(1rem, 2.5vw, 2rem);
   }
 
   .home-hero__eyebrow {
@@ -312,5 +328,14 @@
 @media (min-width: 1100px) {
   .home-proof {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Home-only: keep the document exactly one viewport tall so blur/scale/layout rounding cannot add phantom scrollbars. Main still flex-fills beneath the header — no capped max-height gap. Drawer portals render under document.body, outside #root, so they are not clipped. */
+@supports selector(:has(*)) {
+  #root:has(.home-carousel) {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: clip;
   }
 }
