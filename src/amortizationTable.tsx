@@ -33,6 +33,7 @@ export default function AmortizationTable(props: mortgageInfo) {
   const { loanAmt, rateNum, yearsNum, baseMonthlyPmt } = props;
   const [viewMode, setViewMode] = useState<"monthly" | "yearly">("monthly");
   const [extraYearlyPayment, setExtraYearlyPayment] = useState("");
+  const [openDropdown, setOpenDropdown] = useState(false);
   const dextraYearlyPayment = useDebounce(extraYearlyPayment);
 
   const tableData: AmortResult = useMemo(() => {
@@ -144,34 +145,6 @@ export default function AmortizationTable(props: mortgageInfo) {
 
   return (
     <section className="amort card">
-      <div className="amort__toolbar">
-        <div className="amort__schedule-cluster">
-          <h3 id="amort-schedule-heading" className="amort__schedule-heading">
-            Schedule by
-          </h3>
-          <div
-            className="segmented segmented--amort"
-            role="group"
-            aria-labelledby="amort-schedule-heading"
-          >
-            <button
-              type="button"
-              className={viewMode === "monthly" ? "is-selected" : ""}
-              onClick={() => setViewMode("monthly")}
-            >
-              Monthly
-            </button>
-            <button
-              type="button"
-              className={viewMode === "yearly" ? "is-selected" : ""}
-              onClick={() => setViewMode("yearly")}
-            >
-              Yearly
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div className="amort__meta">
         <div className="amort-extra">
           <label className="field amort-extra__field">
@@ -206,8 +179,37 @@ export default function AmortizationTable(props: mortgageInfo) {
         <table className="data-table">
           <thead>
             <tr>
-              <th scope="col">
-                {viewMode === "monthly" ? "Month" : "Year"}
+              <th scope="col" className="toggle-th">
+                <button
+                  type="button"
+                  className="toggle-th__trigger"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenDropdown((prev) => !prev);
+                  }}
+                >
+                  {viewMode === "monthly" ? "Month" : "Year"}
+                  <span className="toggle-th__arrow" aria-hidden>
+                    ▾
+                  </span>
+                </button>
+
+                <div
+                  className={`toggle-th__dropdown ${openDropdown ? "is-open" : ""
+                    }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setViewMode(viewMode === "monthly" ? "yearly" : "monthly");
+                      setOpenDropdown(false);
+                    }}
+                  >
+                    {viewMode === "monthly"
+                      ? "Change to yearly schedule"
+                      : "Change to monthly schedule"}
+                  </button>
+                </div>
               </th>
               <th scope="col">Principal</th>
               <th scope="col">Interest</th>
@@ -229,7 +231,11 @@ export default function AmortizationTable(props: mortgageInfo) {
 
             {displayRows.map((row) => (
               <tr
-                key={viewMode === "monthly" ? "m" + row.month : "y" + row.year}
+                key={
+                  viewMode === "monthly"
+                    ? "m" + row.month
+                    : "y" + row.year
+                }
               >
                 <td>{viewMode === "monthly" ? row.month : row.year}</td>
                 <td>

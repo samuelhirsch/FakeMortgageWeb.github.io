@@ -2,115 +2,6 @@
   margin-top: clamp(1.5rem, 3vw, 2.25rem);
 }
 
-.amort__toolbar {
-  margin-bottom: 1rem;
-}
-
-.amort__schedule-cluster {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  max-width: 100%;
-  gap: 0.65rem;
-}
-
-.amort__schedule-heading {
-  margin: 0;
-  flex: 1 1 auto;
-  min-width: max-content;
-  padding: 0;
-  font-size: clamp(1rem, 2.8vw, 1.0625rem);
-  font-weight: 650;
-  line-height: 1.35;
-  color: var(--color-ink);
-}
-
-/* Plain layout: no outer mint box — overrides global `.segmented` chrome */
-.amort .segmented--amort {
-  flex-shrink: 0;
-  margin: 0;
-  gap: 0.35rem;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.amort .segmented--amort button {
-  flex-shrink: 0;
-  border: 2px solid transparent;
-  margin: 0;
-  padding: 0.45rem 0.85rem;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-ink-muted);
-  font-weight: 600;
-  transition:
-    color 0.12s ease,
-    background 0.12s ease,
-    border-color 0.12s ease,
-    box-shadow 0.12s ease;
-}
-
-.amort .segmented--amort button:hover:not(.is-selected) {
-  color: var(--color-ink);
-  border-color: var(--color-border-strong);
-  background: rgba(255, 255, 255, 0.95);
-}
-
-.amort .segmented--amort button.is-selected {
-  color: var(--color-primary-deep);
-  font-weight: 700;
-  background: linear-gradient(180deg,
-      #f6fffa 0%,
-      var(--color-primary-soft) 55%,
-      color-mix(in srgb, var(--color-primary-soft) 82%, var(--color-primary) 18%) 100%);
-  border-color: var(--color-primary);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 2px 12px rgba(13, 122, 88, 0.18);
-}
-
-.amort .segmented--amort button.is-selected:hover {
-  border-color: var(--color-primary-deep);
-}
-
-.amort .segmented--amort button:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-
-.amort .segmented--amort button.is-selected:focus-visible {
-  box-shadow:
-    var(--focus-ring),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 2px 12px rgba(13, 122, 88, 0.18);
-}
-
-@media (max-width: 420px) {
-  .amort__schedule-cluster {
-    flex-wrap: nowrap;
-    min-width: 0;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .amort__schedule-heading {
-    flex: 0 0 auto;
-  }
-
-  .amort .segmented--amort {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  .amort .segmented--amort button {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-}
-
 .amort__meta {
   display: flex;
   flex-wrap: wrap;
@@ -173,16 +64,17 @@
     align-items: stretch;
   }
 
-  /* Column layout: flex-grow here stole vertical space; keep box content-sized */
+  /* Same width as the metric cards below (full row), not a narrow chip */
   .amort-extra {
     flex: 0 0 auto;
-    align-self: flex-start;
+    align-self: stretch;
+    width: 100%;
+    max-width: 100%;
     min-width: 0;
-    max-width: min(17rem, 100%);
   }
 
   .amort-extra__input {
-    max-width: 11rem;
+    max-width: 100%;
     width: 100%;
     box-sizing: border-box;
   }
@@ -219,6 +111,110 @@
   line-height: 1.15;
   color: var(--color-ink);
   font-variant-numeric: tabular-nums;
+}
+
+.data-table thead th.toggle-th {
+  overflow: visible;
+  z-index: 2;
+}
+
+.toggle-th {
+  position: relative;
+}
+
+.toggle-th__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: -2px 0;
+  padding: 4px 8px;
+
+  font: inherit;
+  font-weight: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: left;
+  color: inherit;
+
+  background: transparent;
+  border: 1px solid rgba(13, 122, 88, 0.38);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.toggle-th__trigger:hover {
+  background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(13, 122, 88, 0.55);
+  color: var(--color-primary-deep);
+}
+
+.toggle-th__trigger:active {
+  background: color-mix(in srgb, var(--color-primary-soft) 75%, var(--color-primary) 10%);
+  border-color: var(--color-primary);
+  color: var(--color-ink);
+}
+
+.toggle-th__trigger:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.toggle-th__arrow {
+  font-size: 0.78em;
+  opacity: 0.82;
+}
+
+.toggle-th__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+
+  min-width: 200px;
+  z-index: 20;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: all 0.15s ease;
+}
+
+.toggle-th__dropdown::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 14px;
+}
+
+.toggle-th__dropdown.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.toggle-th__dropdown button {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.toggle-th__dropdown button:hover {
+  background: #f3f4f6;
 }
 
 .table-shell {

@@ -23,7 +23,7 @@ export default function MortgageCalculator() {
   const [price, setPrice] = useState("");
   const [downPmt, setDownPmt] = useState("");
   const [rate, setRate] = useState("");
-  const [years, setYears] = useState("");
+  const [years, setYears] = useState("30");
   const [tax, setTax] = useState("");
   const [showTable, setShowTable] = useState(false);
   const [TypeForDpmt, setTypeForDpmt] = useState("%");
@@ -40,8 +40,8 @@ export default function MortgageCalculator() {
 
   const inputsReady =
     dPrice.trim() !== "" &&
-    dRate.trim() !== "" &&
-    years !== "";
+    dRate.trim() !== "";
+    
 
   const finalDownPmt = TypeForDpmt === "%" ? (priceNum * downPmtNum) / 100 : downPmtNum
 
@@ -166,7 +166,11 @@ export default function MortgageCalculator() {
 
             <div className="field">
               <span className="field__label" id="term-label">Loan term (years)</span>
-              <div className="segmented" role="group" aria-labelledby="term-label">
+              <div
+                className="segmented segmented--term"
+                role="group"
+                aria-labelledby="term-label"
+              >
                 <button
                   type="button"
                   className={years === "10" ? "is-selected" : ""}

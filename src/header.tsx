@@ -6,13 +6,15 @@ export default function Header() {
         <div className="site-layout">
             <header className="site-header">
                 <div className="site-header__inner">
-                    <div>
-                        <p className="site-tagline">
-                            Trusted mortgage advisors—experience you can feel at every step
-                        </p>
-                        <h1 className="site-title">The Hirsch Team</h1>
+                    <p className="site-tagline">
+                        Trusted mortgage advisors—experience you can feel at every step
+                    </p>
+                    <div className="site-header__title-row">
+                        <div className="site-header__brand">
+                            <h1 className="site-title">The Hirsch Team</h1>
+                        </div>
+                        <Nav />
                     </div>
-                    <Nav />
                 </div>
             </header>
             <main id="main-content" className="site-main" tabIndex={-1}>
