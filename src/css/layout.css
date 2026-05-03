@@ -449,4 +449,6 @@
   padding: 0;
   display: flex;
   flex-direction: column;
+  /* Reserve header + tagline stack so carousel flex children resolve a real column height */
+  min-height: calc(100dvh - clamp(9.5rem, 22vmin, 13rem));
 }

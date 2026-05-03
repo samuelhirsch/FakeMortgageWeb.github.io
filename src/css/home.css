@@ -40,8 +40,9 @@
   position: relative;
   z-index: 1;
   flex: 1;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
-  height: 100%;
   width: 100%;
   overflow: hidden;
   border: none;
@@ -66,22 +67,26 @@
 
 .home-carousel__track {
   display: flex;
-  height: 100%;
-  min-height: inherit;
+  flex: 1 1 auto;
+  align-items: stretch;
+  min-height: 0;
   will-change: transform;
 }
 
 .home-carousel__slide {
   flex-shrink: 0;
-  height: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  align-self: stretch;
+  min-height: 0;
 }
 
 /* Slide panels */
 .home-slide-shell.home-hero {
   width: 100%;
-  flex: 1;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   padding: clamp(2.2rem, 6vw, 4.25rem) clamp(1.5rem, 4vw, 3rem);
   display: flex;
   flex-direction: column;
