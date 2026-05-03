@@ -254,8 +254,8 @@
   }
 
   .home-slide-shell.home-hero {
-    justify-content: flex-start;
-    padding: clamp(2.75rem, 6vmin, 4.25rem) clamp(1.25rem, 3vw, 2.25rem);
+    justify-content: center;
+    padding: clamp(2rem, 4vmin, 3.5rem) clamp(1.25rem, 3vw, 2.25rem);
   }
 
   .home-hero__eyebrow {
